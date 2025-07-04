@@ -1,6 +1,6 @@
 <p align="center">
   <a href="#">
-    <img src="https://img.shields.io/badge/Python-3.7+-blue?style=for-the-badge&logo=python" alt="Python 3.7+">
+    <img src="https://img.shields.io/badge/Python-3.13+-blue?style=for-the-badge&logo=python" alt="Python 3.13+">
     <img src="https://img.shields.io/badge/FastAPI-0.100.0+-009688?style=for-the-badge&logo=fastapi" alt="FastAPI 0.100.0+">
     <img src="https://img.shields.io/badge/TextBlob-0.18.0+-fcba03?style=for-the-badge&logo=python" alt="TextBlob 0.18.0+">
     <img src="https://img.shields.io/badge/Locust-2.19.0+-green?style=for-the-badge&logo=locust" alt="Locust 2.19.0+">
@@ -22,6 +22,11 @@ This project provides a simple, high-performance API for performing sentiment an
 * [How to Use the API](#how-to-use-the-api)
     * [Running the API Server](#running-the-api-server)
     * [API Endpoints](#api-endpoints)
+* [Dockerization](#dockerization)
+    * [Understanding the Dockerfile](#understanding-the-dockerfile)
+    * [Build the Docker Image](#build-the-docker-image)
+    * [Run the Docker Container](#run-the-docker-container)
+    * [Useful Docker Commands](#useful-docker-commands)
 * [Load Testing with Locust](#load-testing-with-locust)
     * [Running Locust](#running-locust)
 
@@ -50,11 +55,10 @@ python --version
 
 ### Installation
 
-1.  **Clone the repository (if applicable):**
+1.  **Clone the repository:**
 
     ```bash
-    git clone <your-repository-url>
-    cd <your-project-directory>
+    git clone https://github.com/MohsenRahbar/Sentiment-Analysis-API
     ```
 
 2.  **Create a virtual environment (recommended):**
@@ -144,13 +148,80 @@ Once running, you can access the API documentation at `http://127.0.0.1:8000/doc
 
 -----
 
+## 🐳 Dockerization
+
+Docker provides a way to package your application and all its dependencies into a single, portable container. This ensures your API runs consistently across different environments.
+
+### Prerequisites for Dockerization
+
+Ensure you have Docker installed and running on your system. You can check your Docker version with:
+
+```bash
+docker --version
+```
+
+### Understanding the Dockerfile
+
+The `Dockerfile` in the root of this project defines the steps to build the Docker image for your API. It sets up the Python environment, installs dependencies from `requirements.txt`, downloads TextBlob corpora, and configures the API to run using Uvicorn.
+
+### Build the Docker Image
+
+Navigate to your project's root directory in your terminal and build the Docker image. This process might take some time, especially during the first build, as it downloads the base image and installs dependencies.
+
+```bash
+docker build -t sentiment-api .
+```
+
+  * `-t sentiment-api`: Tags your image with a readable name. You can choose any name you like.
+  * `.`: Specifies that the `Dockerfile` is in the current directory.
+
+### Run the Docker Container
+
+Once the image is built, you can run a container from it. This command starts your API in the background and maps the container's port 8000 to your host machine's port 8000, making it accessible from your browser.
+
+```bash
+docker run -d -p 8000:8000 --name sentiment-app-container sentiment-api
+```
+
+  * `-d`: Runs the container in "detached" mode (in the background).
+  * `-p 8000:8000`: Maps host port 8000 to container port 8000.
+  * `--name sentiment-app-container`: Assigns a specific name to your container for easier management.
+  * `sentiment-api`: The name of the image to run.
+
+You can now access your API at `http://127.0.0.1:8000/` or `http://localhost:8000/` in your web browser.
+
+### Useful Docker Commands
+
+  * **List running containers:**
+    ```bash
+    docker ps
+    ```
+  * **List all containers (including stopped ones):**
+    ```bash
+    docker ps -a
+    ```
+  * **Stop a running container:**
+    ```bash
+    docker stop sentiment-app-container
+    ```
+  * **Remove a container (must be stopped first):**
+    ```bash
+    docker rm sentiment-app-container
+    ```
+  * **Remove an image:**
+    ```bash
+    docker rmi sentiment-api
+    ```
+
+-----
+
 ## 📈 Load Testing with Locust
 
 Load testing is crucial for understanding how your API performs under expected and peak user traffic. This project includes a Locust script (`locustfile.py`) to simulate users hitting your sentiment analysis endpoint.
 
 ### Running Locust
 
-1.  **Ensure your FastAPI server is running.** Locust will send requests to it.
+1.  **Ensure your FastAPI server is running.** Locust will send requests to it. If you're using the Dockerized version, make sure the Docker container is running.
 
 2.  **Open a new terminal** and navigate to your project directory.
 
